@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Все для Windows</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Дополнительные стили специально для этой страницы -->
+    <style>
+        /* Стилизация спойлера */
+        details {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        summary {
+            padding: 15px 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #2c3e50;
+            background-color: #f8f9fa;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+
+        summary:hover {
+            background-color: #e9ecef;
+        }
+
+        summary::after {
+            content: '+';
+            font-size: 1.5rem;
+            color: #3498db;
+            transition: transform 0.2s;
+        }
+
+        details[open] summary::after {
+            content: '-';
+        }
+
+        .spoiler-content {
+            padding: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        pre {
+            background-color: #282c34;
+            color: #abb2bf;
+            padding: 15px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Monaco', monospace;
+            position: relative;
+            margin-bottom: 10px;
+        }
+
+        code {
+            font-family: inherit;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        /* Стили для компактной кнопки копирования */
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background-color: transparent;
+            border: none;
+            color: #abb2bf;
+            padding: 5px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 4px;
+        }
+
+        .copy-btn:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+        }
+
+        /* Иконка SVG внутри кнопки */
+        .copy-btn svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Классы для состояний успеха/ошибки (меняем цвет иконки) */
+        .copy-btn.success {
+            color: #2ecc71;
+        }
+
+        .copy-btn.error {
+            color: #e74c3c;
+        }
+
+        .hint-text {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+            margin-top: 5px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <img src="/favicon.svg" alt="Логотип">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/windows.html" class="active">Все для Windows</a></li>
+                <li><a href="/linux.html">Все для Linux</a></li>
+                <li><a href="/pc-config.html">Конфигурация ПК</a></li>
+                <li><a href="/lic-scheta.html">Лицевые счета</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    <h1>🪟 Все для Windows</h1>
+    <p>Инструменты, гайды и полезные утилиты для работы с операционной системой Windows.</p>
+
+    <!-- Раздел Активация -->
+    <section>
+        <h2>Активация Windows</h2>
+        <p>Для быстрой и чистой активации используется скрипт Microsoft Activation Scripts (MAS). Он безопасен и открыт на GitHub.</p>
+
+        <!-- СПОЙЛЕР START -->
+        <details>
+            <summary>Показать команду активации</summary>
+            <div class="spoiler-content">
+                <p><strong>Инструкция:</strong></p>
+                <ol>
+                    <li>Откройте <strong>Терминал</strong> (Windows 11) или <strong>Powershell</strong> от имени администратора.</li>
+                    <li>Нажмите кнопку копирования справа в блоке кода ниже.</li>
+                    <li>Вставьте скопированную команду в терминал и нажмите Enter.</li>
+                </ol>
+
+                <!-- Блок кода с компактной кнопкой копирования -->
+                <pre id="activation-code"><button class="copy-btn" onclick="copyToClipboard('activation-code')" title="Копировать">
+                    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+                    </svg>
+                </button><code>irm https://get.activated.win | iex</code></pre>
+
+                <span class="hint-text">* Команда скачает официальный скрипт MAS и запустит его интерактивно.</span>
+            </div>
+        </details>
+        <!-- СПОЙЛЕР END -->
+
+    </section>
+
+    <!-- Раздел Полезные скрипты -->
+    <section>
+        <h2>Полезные скрипты</h2>
+        <p>Коллекция проверенных скриптов для автоматизации рутинных задач, установки софта и настройки системы.</p>
+
+        <div class="card" style="margin-top: 15px;">
+            <h3>📦 S2R & LibDepo</h3>
+            <p>Репозиторий полезных инструментов и скриптов для системного администрирования и энтузиастов.</p>
+            <a href="https://libdepo.github.io/s2r" target="_blank" rel="noopener noreferrer" class="btn">Перейти к скриптам ↗</a>
+        </div>
+    </section>
+
+</main>
+
+<footer>
+    <p>&copy; 2026 Lappavel.ru. Все права защищены.</p>
+</footer>
+
+<!-- JavaScript для функции копирования -->
+<script>
+    function copyToClipboard(elementId) {
+        const element = document.getElementById(elementId);
+        const codeElement = element.querySelector('code');
+        const textToCopy = codeElement.innerText || codeElement.textContent;
+        const btn = element.querySelector('.copy-btn');
+
+        navigator.clipboard.writeText(textToCopy).then(() => {
+            // Успешное копирование - делаем кнопку зеленой
+            btn.classList.add('success');
+
+            // Возвращаем исходный вид через 2 секунды
+            setTimeout(() => {
+                btn.classList.remove('success');
+            }, 2000);
+        }).catch(err => {
+            console.error('Не удалось скопировать текст:', err);
+            // Ошибка - делаем кнопку красной
+            btn.classList.add('error');
+            setTimeout(() => {
+                btn.classList.remove('error');
+            }, 2000);
+        });
+    }
+</script>
+
+</body>
+</html>
