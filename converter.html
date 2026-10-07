@@ -3,135 +3,128 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Универсальный конвертер JSON в Share-ссылку</title>
+    <title>Конвертер JSON — Lappavel.ru</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <!-- Подключаем общие стили сайта -->
+    <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Локальные стили только для элементов конвертера -->
     <style>
-        :root {
-            --bg-color: #1e1e1e;
-            --text-color: #d4d4d4;
-            --input-bg: #252526;
-            --border-color: #3e3e42;
-            --accent-color: #0e639c;
-            --accent-hover: #1177bb;
-            --success-color: #4ec9b0;
-            --error-color: #f48771;
-        }
-
-        body {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .container {
+        /* Адаптация контейнера под layout сайта */
+        .converter-container {
             width: 100%;
             max-width: 900px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
+            margin: 0 auto;
+            padding: 20px;
         }
 
-        h2 {
-            margin: 0 0 10px 0;
-            font-size: 1.2rem;
-            color: var(--success-color);
-            border-bottom: 1px solid var(--border-color);
+        /* Карточка вокруг всего инструмента */
+        .tool-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            padding: 30px;
+        }
+
+        h2.tool-title {
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            border-bottom: 2px solid #f4f6f9;
             padding-bottom: 10px;
         }
 
         label {
-            font-size: 0.9rem;
-            font-weight: bold;
-            margin-bottom: 5px;
             display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #34495e;
         }
 
         textarea {
             width: 100%;
-            height: 250px;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
-            padding: 10px;
-            font-family: inherit;
-            font-size: 0.85rem;
+            height: 200px;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9rem;
             resize: vertical;
+            transition: border-color 0.2s;
+            background-color: #fafafa;
             box-sizing: border-box;
-            outline: none;
         }
 
         textarea:focus {
-            border-color: var(--accent-color);
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
         }
 
         .button-group {
             display: flex;
             gap: 10px;
+            margin: 15px 0;
             align-items: center;
             flex-wrap: wrap;
         }
 
-        button {
-            background-color: var(--accent-color);
+        /* Переопределяем стандартные кнопки сайта для этого блока */
+        button.action-btn {
+            background-color: #3498db;
             color: white;
             border: none;
             padding: 10px 20px;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            font-family: inherit;
-            font-size: 0.9rem;
             font-weight: bold;
-            transition: background-color 0.2s, transform 0.1s;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
         }
 
-        button:hover {
-            background-color: var(--accent-hover);
+        button.action-btn:hover {
+            background-color: #2980b9;
         }
 
-        button:active {
-            transform: translateY(1px);
+        button.secondary-btn {
+            background-color: #ecf0f1;
+            color: #2c3e50;
+            border: 1px solid #bdc3c7;
         }
 
-        button.secondary {
-            background-color: #3c3c3c;
-        }
-
-        button.secondary:hover {
-            background-color: #4c4c4c;
+        button.secondary-btn:hover {
+            background-color: #dde4e6;
         }
 
         #status {
-            font-size: 0.85rem;
-            margin-top: 5px;
-            min-height: 1.2em;
+            font-size: 0.9rem;
+            font-weight: bold;
             margin-left: 10px;
         }
 
-        .status-error { color: var(--error-color); }
-        .status-success { color: var(--success-color); }
+        .status-error { color: #e74c3c; }
+        .status-success { color: #2ecc71; }
 
         .output-wrapper {
             position: relative;
+            margin-top: 20px;
         }
 
+        /* Индикатор копирования в углу поля вывода */
         .copy-indicator {
             position: absolute;
-            right: 10px;
-            top: 10px;
+            right: 15px;
+            top: 45px; /* Смещение вниз от лейбла */
             font-size: 0.8rem;
-            color: var(--success-color);
+            color: #2ecc71;
             opacity: 0;
             transition: opacity 0.3s;
             pointer-events: none;
-            background-color: rgba(30, 30, 30, 0.8);
-            padding: 2px 6px;
-            border-radius: 3px;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #eee;
         }
 
         .copy-indicator.visible {
@@ -141,31 +134,59 @@
 </head>
 <body>
 
-<div class="container">
-    <h2>Конвертер JSON в VLESS / Hysteria 2 ссылку</h2>
+<!-- ОБЩАЯ ШАПКА САЙТА -->
+<header>
+    <div class="header-inner">
+        <a href="/" class="logo">
+            <img src="/favicon.svg" alt="Логотип">
+        </a>
+        <nav>
+            <ul>
+                <li><a href="/">Главная</a></li>
+                <li><a href="/windows.html">Все для Windows</a></li>
+                <li><a href="/linux.html">Все для Linux</a></li>
+                <li><a href="/pc-config.html">Конфигурация ПК</a></li>
+                <li><a href="/lic-scheta.html">ЛС</a></li>
+                <li><a href="/converter.html" class="active">Конвертер JSON</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
 
-    <div>
-        <label for="jsonInput">Входные данные (JSON):</label>
-        <textarea id="jsonInput" placeholder='Вставьте сюда содержимое JSON-файла...'></textarea>
+<main class="container converter-container">
+
+    <div class="tool-card">
+        <h2 class="tool-title">🔄 Конвертер JSON → VLESS / Hysteria 2</h2>
+
+        <div style="margin-bottom: 20px;">
+            <label for="jsonInput">Входные данные (JSON конфиг):</label>
+            <textarea id="jsonInput" placeholder='Вставьте сюда содержимое JSON-файла...'></textarea>
+        </div>
+
+        <div class="button-group">
+            <button id="convertBtn" class="action-btn">Конвертировать</button>
+            <button id="clearBtn" class="secondary-btn action-btn">Очистить</button>
+            <span id="status"></span>
+        </div>
+
+        <div class="output-wrapper">
+            <label for="linkOutput">Результат (Share-ссылка):</label>
+            <textarea id="linkOutput" readonly placeholder="Здесь появится сгенерированная ссылка..."></textarea>
+            <span id="copyIndicator" class="copy-indicator">Скопировано!</span>
+        </div>
+
+        <div class="button-group">
+            <button id="copyBtn" class="secondary-btn action-btn">Скопировать ссылку</button>
+            <button id="copyConfigBtn" class="secondary-btn action-btn">Копировать имя + ссылку</button>
+        </div>
     </div>
 
-    <div class="button-group">
-        <button id="convertBtn">Конвертировать</button>
-        <button id="clearBtn" class="secondary">Очистить</button>
-        <span id="status"></span>
-    </div>
+</main>
 
-    <div class="output-wrapper">
-        <label for="linkOutput">Результат (Share-ссылка):</label>
-        <textarea id="linkOutput" readonly placeholder="Здесь появится сгенерированная ссылка..."></textarea>
-        <span id="copyIndicator" class="copy-indicator">Скопировано!</span>
-    </div>
-
-    <div class="button-group">
-        <button id="copyBtn" class="secondary">Скопировать ссылку</button>
-        <button id="copyConfigBtn" class="secondary">Копировать конфиг (Имя + Ссылка)</button>
-    </div>
-</div>
+<!-- ОБЩИЙ ПОДВАЛ САЙТА -->
+<footer>
+    <p>&copy; 2026 Lappavel.ru. Все права защищены.</p>
+</footer>
 
 <script>
     const jsonInput = document.getElementById('jsonInput');
@@ -270,7 +291,6 @@
             const params = new URLSearchParams();
             if (tlsSettings.serverName) params.append('sni', tlsSettings.serverName);
             if (tlsSettings.alpn && tlsSettings.alpn.length > 0) params.append('alpn', tlsSettings.alpn[0]);
-            // insecure=0 по умолчанию, можно добавить явно, если требуется
 
             const queryString = params.toString().replace(/\+/g, '%20');
             finalLink = `hy2://${auth}@${address}:${port}?${queryString}#${remarkEncoded}`;
@@ -283,7 +303,7 @@
     function showCopyFeedback(buttonElement) {
         copyIndicator.classList.add('visible');
         const originalText = buttonElement.textContent;
-        buttonElement.textContent = 'Скопировано!';
+        buttonElement.textContent = '✅ Готово!';
         setTimeout(() => {
             copyIndicator.classList.remove('visible');
             buttonElement.textContent = originalText;

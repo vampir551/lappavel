@@ -6,6 +6,66 @@
     <title>Лицевые счета</title>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/css/style.css">
+
+    <!-- Стили для экрана блокировки -->
+    <style>
+        #lock-screen {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        #lock-screen h2 {
+            color: #e74c3c;
+            margin-bottom: 20px;
+        }
+
+        .password-input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .password-field {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            width: 60%;
+            font-size: 1rem;
+        }
+
+        .submit-btn {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.2s;
+        }
+
+        .submit-btn:hover {
+            background-color: #2980b9;
+        }
+
+        #error-message {
+            color: red;
+            margin-top: 10px;
+            display: none;
+            font-size: 0.9rem;
+        }
+
+        /* Основной контент страницы (скрыт по умолчанию) */
+        #protected-content {
+            display: none;
+        }
+    </style>
 </head>
 <body>
 
@@ -28,53 +88,101 @@
 </header>
 
 <main class="container">
-    <h1>💳 Лицевые счета</h1>
-    <p>Здесь собраны лицевые счета для оплаты ЖКХ</p>
 
-    <section>
-<!--        <h2>Основные темы</h2> -->
-        <div class="grid">
-            <div class="card">
-                <h3>Свет МЫ</h3>
-                <p>522062017962</p>
-                <h3>Свет Мама</h3>
-                <p>522062055686</p>
-                <a href="https://lk-nn.tns-e.ru/" target="_blank" class="btn">Передать показания</a>
-            </div>
-            <div class="card">
-                <h3>Газ Мама</h3>
-                <p>057000220947</p>
-                <a href="https://gas-nn.ru/" target="_blank" class="btn">Передать показания</a>
-            </div>
-            <div class="card">
-                <h3>СБК Мама</h3>
-                <p>Передача холодной воды</p>
-                <p>800082003</p>
-                <a href="https://bcnn.ru/cntr_readings" target="_blank" class="btn">Передать показания</a>
-            </div>
-            <div class="card">
-                <h3>Теплоэнерго</h3>
-                <p>Передача горячей воды</p>
-                <a href="https://zhitel.oko-nn.ru/" target="_blank" class="btn">Передать показания</a>
-            </div>
+    <!-- ЭКРАН ВВОДА ПАРОЛЯ -->
+    <div id="lock-screen">
+        <h2>🔒 Доступ ограничен</h2>
+        <p>Эта страница содержит конфиденциальную информацию.</p>
+        <p>Введите пароль для просмотра:</p>
+
+        <div class="password-input-group">
+            <input type="password" id="user-password" class="password-field" placeholder="Ваш пароль...">
+            <button onclick="unlockPage()" class="submit-btn">Войти</button>
         </div>
-    </section>
+        <span id="error-message">❌ Неверный пароль!</span>
+    </div>
 
-<!--    <section>
-        <h2>Скоро здесь будут:</h2>
-        <ul class="content-list">
-            <li>Автоматизация хранения квитанций</li>
-            <li>Шпаргалка: где смотреть показания счётчиков</li>
-            <li>Как оспорить начисления</li>
-            <li>Перенос лицевого счёта при смене собственника</li>
-        </ul>
-    </section>
--->
+    <!-- ЗАЩИЩЕННЫЙ КОНТЕНТ (ТО ЧТО БЫЛО РАНЬШЕ) -->
+    <div id="protected-content">
+        <h1>💳 Лицевые счета</h1>
+        <p>Здесь собраны лицевые счета для оплаты ЖКХ</p>
+
+        <section>
+            <div class="grid">
+                <div class="card">
+                    <h3>Свет МЫ</h3>
+                    <p>522062017962</p>
+                    <h3>Свет Мама</h3>
+                    <p>522062055686</p>
+                    <a href="https://lk-nn.tns-e.ru/" target="_blank" rel="noopener noreferrer" class="btn">Передать показания</a>
+                </div>
+                <div class="card">
+                    <h3>Газ Мама</h3>
+                    <p>057000220947</p>
+                    <a href="https://gas-nn.ru/" target="_blank" rel="noopener noreferrer" class="btn">Передать показания</a>
+                </div>
+                <div class="card">
+                    <h3>СБК Мама</h3>
+                    <p>Передача холодной воды</p>
+                    <p>800082003</p>
+                    <a href="https://bcnn.ru/cntr_readings" target="_blank" rel="noopener noreferrer" class="btn">Передать показания</a>
+                </div>
+                <div class="card">
+                    <h3>Теплоэнерго</h3>
+                    <p>Передача горячей воды</p>
+                    <a href="https://zhitel.oko-nn.ru/" target="_blank" rel="noopener noreferrer" class="btn">Передать показания</a>
+                </div>
+            </div>
+        </section>
+    </div>
+
 </main>
 
 <footer>
     <p>&copy; 2026 Lappavel.ru. Все права защищены.</p>
 </footer>
+
+<!-- JavaScript для проверки пароля -->
+<script>
+
+    const correctPassword = "мойпароль123";
+
+    function unlockPage() {
+        const inputField = document.getElementById('user-password');
+        const errorMessage = document.getElementById('error-message');
+        const lockScreen = document.getElementById('lock-screen');
+        const protectedContent = document.getElementById('protected-content');
+
+        if (inputField.value === correctPassword) {
+            // Пароль верный
+            lockScreen.style.display = 'none';       // Прячем форму
+            protectedContent.style.display = 'block'; // Показываем контент
+
+            // Запоминаем факт входа на время сессии браузера
+            sessionStorage.setItem('lic_access', 'true');
+        } else {
+            // Пароль неверный
+            errorMessage.style.display = 'block';
+            inputField.value = ''; // Очищаем поле
+            inputField.focus();    // Курсор обратно в поле
+        }
+    }
+
+    // Проверка при загрузке: если пользователь уже вводил пароль в этой сессии
+    window.onload = function() {
+        if (sessionStorage.getItem('lic_access') === 'true') {
+            document.getElementById('lock-screen').style.display = 'none';
+            document.getElementById('protected-content').style.display = 'block';
+        }
+    };
+
+    // Позволяет нажать Enter вместо клика по кнопке
+    document.getElementById('user-password').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            unlockPage();
+        }
+    });
+</script>
 
 </body>
 </html>
