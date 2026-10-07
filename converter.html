@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Универсальный конвертер JSON в Share-ссылку</title>
+    <style>
+        :root {
+            --bg-color: #1e1e1e;
+            --text-color: #d4d4d4;
+            --input-bg: #252526;
+            --border-color: #3e3e42;
+            --accent-color: #0e639c;
+            --accent-hover: #1177bb;
+            --success-color: #4ec9b0;
+            --error-color: #f48771;
+        }
+
+        body {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.2rem;
+            color: var(--success-color);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        label {
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        textarea {
+            width: 100%;
+            height: 250px;
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            padding: 10px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        textarea:focus {
+            border-color: var(--accent-color);
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        button:hover {
+            background-color: var(--accent-hover);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        button.secondary {
+            background-color: #3c3c3c;
+        }
+
+        button.secondary:hover {
+            background-color: #4c4c4c;
+        }
+
+        #status {
+            font-size: 0.85rem;
+            margin-top: 5px;
+            min-height: 1.2em;
+            margin-left: 10px;
+        }
+
+        .status-error { color: var(--error-color); }
+        .status-success { color: var(--success-color); }
+
+        .output-wrapper {
+            position: relative;
+        }
+
+        .copy-indicator {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 0.8rem;
+            color: var(--success-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+            background-color: rgba(30, 30, 30, 0.8);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .copy-indicator.visible {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Конвертер JSON в VLESS / Hysteria 2 ссылку</h2>
+
+    <div>
+        <label for="jsonInput">Входные данные (JSON):</label>
+        <textarea id="jsonInput" placeholder='Вставьте сюда содержимое JSON-файла...'></textarea>
+    </div>
+
+    <div class="button-group">
+        <button id="convertBtn">Конвертировать</button>
+        <button id="clearBtn" class="secondary">Очистить</button>
+        <span id="status"></span>
+    </div>
+
+    <div class="output-wrapper">
+        <label for="linkOutput">Результат (Share-ссылка):</label>
+        <textarea id="linkOutput" readonly placeholder="Здесь появится сгенерированная ссылка..."></textarea>
+        <span id="copyIndicator" class="copy-indicator">Скопировано!</span>
+    </div>
+
+    <div class="button-group">
+        <button id="copyBtn" class="secondary">Скопировать ссылку</button>
+        <button id="copyConfigBtn" class="secondary">Копировать конфиг (Имя + Ссылка)</button>
+    </div>
+</div>
+
+<script>
+    const jsonInput = document.getElementById('jsonInput');
+    const linkOutput = document.getElementById('linkOutput');
+    const convertBtn = document.getElementById('convertBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const copyConfigBtn = document.getElementById('copyConfigBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const status = document.getElementById('status');
+    const copyIndicator = document.getElementById('copyIndicator');
+
+    let currentRemark = '';
+
+    function setStatus(message, isError = false) {
+        status.textContent = message;
+        status.className = isError ? 'status-error' : 'status-success';
+    }
+
+    function clearStatus() {
+        status.textContent = '';
+        status.className = '';
+    }
+
+    convertBtn.addEventListener('click', () => {
+        clearStatus();
+        const rawJson = jsonInput.value.trim();
+
+        if (!rawJson) {
+            setStatus('Ошибка: Поле ввода пустое.', true);
+            return;
+        }
+
+        let config;
+        try {
+            config = JSON.parse(rawJson);
+        } catch (e) {
+            setStatus('Ошибка: Невалидный JSON формат. Проверьте синтаксис.', true);
+            return;
+        }
+
+        const outbound = config.outbounds?.find(out => ['vless', 'hysteria'].includes(out.protocol));
+        if (!outbound) {
+            setStatus('Ошибка: Поддерживаются только протоколы "vless" или "hysteria".', true);
+            return;
+        }
+
+        const protocol = outbound.protocol;
+        currentRemark = config.remarks || config.name || `${protocol.toUpperCase()}_Config`;
+        const remarkEncoded = encodeURIComponent(currentRemark);
+
+        let finalLink = '';
+
+        if (protocol === 'vless') {
+            const vnext = outbound.settings?.vnext?.[0];
+            if (!vnext || !vnext.users?.[0]) {
+                setStatus('Ошибка: Неверная структура VLESS (отсутствует vnext или users).', true);
+                return;
+            }
+
+            const user = vnext.users[0];
+            const stream = outbound.streamSettings || {};
+            const security = stream.security || 'none';
+            const params = new URLSearchParams();
+
+            params.append('type', stream.network || 'tcp');
+            params.append('security', security);
+
+            if (security === 'reality' || security === 'tls') {
+                const secSettings = stream[`${security}Settings`] || {};
+                if (secSettings.serverName) params.append('sni', secSettings.serverName);
+                if (security === 'reality') {
+                    if (secSettings.publicKey) params.append('pbk', secSettings.publicKey);
+                    if (secSettings.shortId) params.append('sid', secSettings.shortId);
+                    if (secSettings.spiderX) params.append('spx', secSettings.spiderX);
+                    if (secSettings.fingerprint) params.append('fp', secSettings.fingerprint);
+                }
+            }
+
+            if (user.flow) params.append('flow', user.flow);
+
+            ['sockopt', 'tcpSettings', 'wsSettings', 'grpcSettings', 'httpupgradeSettings'].forEach(key => {
+                if (stream[key] && Object.keys(stream[key]).length > 0) {
+                    params.append(key, JSON.stringify(stream[key]));
+                }
+            });
+
+            const queryString = params.toString().replace(/\+/g, '%20');
+            finalLink = `vless://${user.id}@${vnext.address}:${vnext.port}?${queryString}#${remarkEncoded}`;
+
+        } else if (protocol === 'hysteria') {
+            const address = outbound.settings?.address;
+            const port = outbound.settings?.port;
+            // Auth может быть в settings или в streamSettings.hysteriaSettings
+            const auth = outbound.streamSettings?.hysteriaSettings?.auth || outbound.settings?.auth || '';
+            const tlsSettings = outbound.streamSettings?.tlsSettings || {};
+
+            if (!address || !port) {
+                setStatus('Ошибка: Неверная структура Hysteria (отсутствует address или port).', true);
+                return;
+            }
+
+            const params = new URLSearchParams();
+            if (tlsSettings.serverName) params.append('sni', tlsSettings.serverName);
+            if (tlsSettings.alpn && tlsSettings.alpn.length > 0) params.append('alpn', tlsSettings.alpn[0]);
+            // insecure=0 по умолчанию, можно добавить явно, если требуется
+
+            const queryString = params.toString().replace(/\+/g, '%20');
+            finalLink = `hy2://${auth}@${address}:${port}?${queryString}#${remarkEncoded}`;
+        }
+
+        linkOutput.value = finalLink;
+        setStatus(`Конвертация ${protocol.toUpperCase()} успешно завершена.`);
+    });
+
+    function showCopyFeedback(buttonElement) {
+        copyIndicator.classList.add('visible');
+        const originalText = buttonElement.textContent;
+        buttonElement.textContent = 'Скопировано!';
+        setTimeout(() => {
+            copyIndicator.classList.remove('visible');
+            buttonElement.textContent = originalText;
+        }, 2000);
+    }
+
+    copyBtn.addEventListener('click', async () => {
+        const textToCopy = linkOutput.value.trim();
+        if (!textToCopy) {
+            setStatus('Нечего копировать: поле вывода пустое.', true);
+            return;
+        }
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            showCopyFeedback(copyBtn);
+            clearStatus();
+        } catch (err) {
+            setStatus('Ошибка при копировании в буфер обмена.', true);
+        }
+    });
+
+    copyConfigBtn.addEventListener('click', async () => {
+        const linkText = linkOutput.value.trim();
+        if (!linkText || !currentRemark) {
+            setStatus('Сначала выполните успешную конвертацию.', true);
+            return;
+        }
+        const textToCopy = `${currentRemark}\n${linkText}`;
+        try {
+            await navigator.clipboard.writeText(textToCopy);
+            showCopyFeedback(copyConfigBtn);
+            clearStatus();
+        } catch (err) {
+            setStatus('Ошибка при копировании в буфер обмена.', true);
+        }
+    });
+
+    clearBtn.addEventListener('click', () => {
+        jsonInput.value = '';
+        linkOutput.value = '';
+        currentRemark = '';
+        clearStatus();
+        jsonInput.focus();
+    });
+</script>
+
+</body>
+</html>
